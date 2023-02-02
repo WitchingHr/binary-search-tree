@@ -184,6 +184,23 @@ function Tree(array) {
       return array;
     },
 
+    height: function(value, position, height = 0, most = 0) {
+      position = position || this.find(value);
+
+      if (position.left) {
+        height += 1;
+        most = this.height(value, position.left, height, most);
+        height -= 1;
+      }
+      if (position.right) {
+        height += 1;
+        most = this.height(value, position.right, height, most);
+        height -= 1;
+      }
+      if (height > most) most = height;
+      return most;
+    },
+
     print: function(node = this.root, prefix = '', isLeft = true) {
       if (node.right !== null) {
         this.print(node.right, `${prefix}${isLeft ? '│   ' : '    '}`, false);
