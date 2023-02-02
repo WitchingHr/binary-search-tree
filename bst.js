@@ -1,4 +1,4 @@
-function Node(data, left, right) {
+function Node(data, left = null, right = null) {
   return {
     data,
     left,
@@ -30,6 +30,34 @@ function Tree(array) {
 
   return {
     root: BuildTree(noDupes),
+
+    insert: function(value, position = this.root) {
+      let pointer = position;
+      if (value === pointer.data) return;
+
+      if (value < pointer.data) {
+        if (pointer.left === null) {
+          // Add node
+          pointer.left = Node(value);
+          return;
+        }
+        // Go left
+        pointer = pointer.left;
+        this.insert(value, pointer);
+        return;
+      }
+      if (value > pointer.data) {
+        if (pointer.right === null) {
+          // Add node
+          pointer.left = Node(value);
+          return;
+        }
+        // Go right
+        pointer = pointer.right;
+        this.insert(value,pointer);
+        return;
+      }
+    },
   };
 }
 
