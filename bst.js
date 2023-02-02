@@ -151,6 +151,39 @@ function Tree(array) {
       return breadthFirst;
     },
 
+    inorder: function(position = this.root, array = []) {
+      if (position.left) {
+        this.inorder(position.left, array);
+      }
+      array.push(position.data);
+      if (position.right) {
+        this.inorder(position.right, array);
+      }
+      return array;
+    },
+
+    preorder: function(position = this.root, array = []) {
+      array.push(position.data);
+      if (position.left) {
+        this.preorder(position.left, array);
+      }
+      if (position.right) {
+        this.preorder(position.right, array);
+      }
+      return array;
+    },
+
+    postorder: function(position = this.root, array = []) {
+      if (position.left) {
+        this.postorder(position.left, array);
+      }
+      if (position.right) {
+        this.postorder(position.right, array);
+      }
+      array.push(position.data);
+      return array;
+    },
+
     print: function(node = this.root, prefix = '', isLeft = true) {
       if (node.right !== null) {
         this.print(node.right, `${prefix}${isLeft ? '│   ' : '    '}`, false);
@@ -164,11 +197,11 @@ function Tree(array) {
   };
 }
 
-// const myArr = [64, 2, 6, 72, 34, 4, 6, 63, 6, 4, 13, 12];
-// const tree = Tree(myArr);
-// tree.print();
+const myArr = [4, 10, 12, 15, 18, 22, 24, 25, 31, 35, 44, 50, 66, 70, 90];
+const tree = Tree(myArr);
+tree.print();
 
-// let sum = 0;
-// function getSum(x) {
-//   return sum += x;
-// }
+let sum = 0;
+function getSum(x) {
+  return sum += x;
+}
