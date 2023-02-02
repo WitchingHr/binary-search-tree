@@ -32,46 +32,143 @@ function Tree(array) {
     root: BuildTree(noDupes),
 
     insert: function(value, position = this.root) {
-      let pointer = position;
-      if (value === pointer.data) return;
+      // If node already exists
+      if (value === position.data) return;
 
-      if (value < pointer.data) {
-        if (pointer.left === null) {
+      // If less than root
+      if (value < position.data) {
+        if (position.left === null) {
           // Add node
-          pointer.left = Node(value);
+          position.left = Node(value);
           return;
         }
         // Go left
-        pointer = pointer.left;
-        this.insert(value, pointer);
+        this.insert(value, position.left);
         return;
       }
-      if (value > pointer.data) {
-        if (pointer.right === null) {
+
+      // If greater than root
+      if (value > position.data) {
+        if (position.right === null) {
           // Add node
-          pointer.left = Node(value);
+          position.left = Node(value);
           return;
         }
         // Go right
-        pointer = pointer.right;
-        this.insert(value,pointer);
+        this.insert(value, position.right);
         return;
       }
     },
+
+    delete: function(value, position = this.root) {
+      // Base case
+      if (position === null) return position;
+
+      // If value doesn't equal root
+      if (value < position.data) {
+        // Go left
+        position.left = this.delete(value, position.left);
+      } else if (value > position.data) {
+        // Go right
+        position.right = this.delete(value, position.right);
+      } 
+      
+      // If value equals root
+      else {
+
+        // If missing children, one or both
+        if (position.left === null) {
+          return position.right;
+        } else if (position.right === null) {
+          return position.left;
+        }
+
+        // If has both children
+        let key = position.right.data;
+        let root = position.right;
+
+        // Find smallest node in right tree
+        while (root.left !== null) {
+          key = root.left.data;
+          root = root.left;
+        }
+
+        // Set root data to smallest
+        position.data = key;
+
+        // Delete smallest, shift any children
+        position.right = this.delete(key, position.right);
+      }
+      return position;
+    },
+
+    find: function(value, position = this.root) {
+      // Base cases
+      if (position === null) return "Node doesn't exist";
+      if (value === position.data) return position;
+
+      // Traverse tree
+      if (value < position.data) {
+        return this.find(value, position.left);
+      } else if (value > position.data) {
+        return this.find(value, position.right);
+      }
+    },
+
+    levelOrder: function(fn) {
+      const queue = [];
+      queue.push(this.root);
+
+      function populateArrays(array = []) {
+        // Base case
+        if (queue.length === 0) return array;
+
+        const [ position ] = queue;
+        array.push(position.data);
+
+        // Queue children
+        if (position.left !== null) {
+          queue.push(position.left);
+        }
+        if (position.right !== null) {
+          queue.push(position.right);
+        }
+
+        queue.shift();
+        return populateArrays(array);
+      }
+
+      // Get breadth-first array
+      const breadthFirst = populateArrays();
+
+      // Execute passed function for each element with element as argument
+      if (fn) {
+        breadthFirst.forEach(element => {
+          fn(element);
+        });
+      }
+
+      return breadthFirst;
+    },
+
+    print: function(node = this.root, prefix = '', isLeft = true) {
+      if (node.right !== null) {
+        this.print(node.right, `${prefix}${isLeft ? '│   ' : '    '}`, false);
+      }
+      console.log(`${prefix}${isLeft ? '└── ' : '┌── '}${node.data}`);
+      if (node.left !== null) {
+        this.print(node.left, `${prefix}${isLeft ? '    ' : '│   '}`, true);
+      }
+    },
+
   };
 }
 
-// Print tree
-const prettyPrint = (node, prefix = '', isLeft = true) => {
-  if (node.right !== null) {
-    prettyPrint(node.right, `${prefix}${isLeft ? '│   ' : '    '}`, false);
-  }
-  console.log(`${prefix}${isLeft ? '└── ' : '┌── '}${node.data}`);
-  if (node.left !== null) {
-    prettyPrint(node.left, `${prefix}${isLeft ? '    ' : '│   '}`, true);
-  }
-};
+// const myArr = [64, 2, 6, 72, 34, 4, 6, 63, 6, 4, 13, 12];
+// const tree = Tree(myArr);
+// tree.print();
 
-const myArr = [64, 2, 6, 72, 34, 4, 6, 63, 6, 4, 13, 12];
-const myTree = Tree(myArr);
-prettyPrint(myTree.root);
+// let sum = 0;
+// function getSum(x) {
+//   return sum += x;
+// }
