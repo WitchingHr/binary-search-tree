@@ -37,24 +37,31 @@ function Tree(array) {
 
       // If less than root
       if (value < position.data) {
+
+        // If left is empty
         if (position.left === null) {
+
           // Add node
           position.left = Node(value);
           return;
         }
-        // Go left
+
+        // Else Go left
         this.insert(value, position.left);
         return;
       }
 
       // If greater than root
       if (value > position.data) {
+
+        // If right is empty
         if (position.right === null) {
           // Add node
-          position.left = Node(value);
+          position.right = Node(value);
           return;
         }
-        // Go right
+
+        // Else Go right
         this.insert(value, position.right);
         return;
       }
@@ -64,11 +71,15 @@ function Tree(array) {
       // Base case
       if (position === null) return position;
 
-      // If value doesn't equal root
+      // If value is less than root
       if (value < position.data) {
+
         // Go left
         position.left = this.delete(value, position.left);
+
+      // If value is greater than root
       } else if (value > position.data) {
+
         // Go right
         position.right = this.delete(value, position.right);
       } 
@@ -93,12 +104,13 @@ function Tree(array) {
           root = root.left;
         }
 
-        // Set root data to smallest
+        // Set root to smallest
         position.data = key;
 
         // Delete smallest, shift any children
         position.right = this.delete(key, position.right);
       }
+
       return position;
     },
 
@@ -109,24 +121,32 @@ function Tree(array) {
 
       // Traverse tree
       if (value < position.data) {
+
+        // Go left
         return this.find(value, position.left);
+
       } else if (value > position.data) {
+
+        // Go right
         return this.find(value, position.right);
       }
     },
 
     levelOrder: function(fn) {
+      // Initialize queue
       const queue = [];
       queue.push(this.root);
 
-      function populateArrays(array = []) {
+      // Recursion
+      function getArray(array = []) {
         // Base case
         if (queue.length === 0) return array;
 
+        // Populate array
         const [ position ] = queue;
         array.push(position.data);
 
-        // Queue children
+        // Enqueue children
         if (position.left !== null) {
           queue.push(position.left);
         }
@@ -134,12 +154,14 @@ function Tree(array) {
           queue.push(position.right);
         }
 
+        // Dequeue
         queue.shift();
-        return populateArrays(array);
+
+        return getArray(array);
       }
 
-      // Get breadth-first array
-      const breadthFirst = populateArrays();
+      // Get array
+      const breadthFirst = getArray();
 
       // Execute passed function for each element with element as argument
       if (fn) {
@@ -151,57 +173,185 @@ function Tree(array) {
       return breadthFirst;
     },
 
-    inorder: function(position = this.root, array = []) {
-      if (position.left) {
-        this.inorder(position.left, array);
+    inorder: function(fn) {
+      // Recursion
+      const getArray = (position = this.root, array = []) => {
+        // Go left
+        if (position.left) {
+          getArray(position.left, array);
+        }
+
+        // Push root
+        array.push(position.data);
+
+        // Go right
+        if (position.right) {
+          getArray(position.right, array);
+        }
+
+        return array;
       }
-      array.push(position.data);
-      if (position.right) {
-        this.inorder(position.right, array);
+
+      // Get array
+      const inorderArray = getArray();
+
+      // Execute passed function for each element with element as argument
+      if (fn) {
+        array.forEach(element => {
+          fn(element);
+        });
       }
-      return array;
+
+      return inorderArray;
     },
 
-    preorder: function(position = this.root, array = []) {
-      array.push(position.data);
-      if (position.left) {
-        this.preorder(position.left, array);
+    preorder: function(fn) {
+      // Recursion
+      const getArray = (position = this.root, array = []) => {
+        // Push root
+        array.push(position.data);
+
+        // Go left
+        if (position.left) {
+          getArray(position.left, array);
+        }
+
+        // Go right
+        if (position.right) {
+          getArray(position.right, array);
+        }
+
+        return array;
       }
-      if (position.right) {
-        this.preorder(position.right, array);
+
+      // Get array
+      const preorderArray = getArray();
+
+      // Execute passed function for each element with element as argument
+      if (fn) {
+        preorderArray.forEach(element => {
+          fn(element);
+        });
       }
-      return array;
+
+      return preorderArray;
     },
 
-    postorder: function(position = this.root, array = []) {
-      if (position.left) {
-        this.postorder(position.left, array);
+    postorder: function(fn) {
+      // Recursion
+      const getArray = (position = this.root, array = []) => {
+        // Go left
+        if (position.left) {
+          getArray(position.left, array);
+        }
+
+        // Go right
+        if (position.right) {
+          getArray(position.right, array);
+        }
+
+        // Push root
+        array.push(position.data);
+
+        return array;
       }
-      if (position.right) {
-        this.postorder(position.right, array);
+
+      // Get array
+      const postorderArray = getArray();
+
+      // Execute passed function for each element with element as argument
+      if (fn) {
+        postorderArray.forEach(element => {
+          fn(element);
+        });
       }
-      array.push(position.data);
-      return array;
+
+      return postorderArray;
     },
 
     height: function(value, position, height = 0, most = 0) {
+      // Find node, or set to root
       position = position || this.find(value);
 
+      // Check left
       if (position.left) {
+
+        // When going down
         height += 1;
+
+        // Go left
         most = this.height(value, position.left, height, most);
+
+        // When coming back up
         height -= 1;
       }
+      
+      // Check right
       if (position.right) {
+
+        // When going down
         height += 1;
+        
+        // Go right
         most = this.height(value, position.right, height, most);
+
+        // When coming back up
         height -= 1;
       }
+
+      // Compare, set most
       if (height > most) most = height;
+
       return most;
     },
 
+    depth: function(value, position = this.root, depth = 0) {
+      // Base case
+      if (value === position.data) return depth;
+
+      // If less than root
+      if (value < position.data) {
+
+        // Set depth
+        depth += 1;
+
+        // Go left
+        return this.depth(value, position.left, depth);
+      }
+
+      // If greather than root
+      if (value > position.data) {
+
+        // Set depth
+        depth += 1;
+
+        // Go right
+        return this.depth(value, position.right, depth);
+      }
+
+      return "Node doesn't exist";
+    },
+
+    isBalanced: function() {
+      // Get height of subtrees
+      const left = this.height(null, this.root.left);
+      const right = this.height(null, this.root.right);
+
+      // Compare
+      const result = Math.abs(left - right);
+      return (result === 1 || result === 0) ? true : false;
+    },
+
+    rebalance: function() {
+      // Get array
+      const array = this.inorder();
+
+      // Build new tree, set as root
+      this.root = BuildTree(array);
+    },
+
     print: function(node = this.root, prefix = '', isLeft = true) {
+      // Black magic
       if (node.right !== null) {
         this.print(node.right, `${prefix}${isLeft ? '│   ' : '    '}`, false);
       }
@@ -214,11 +364,6 @@ function Tree(array) {
   };
 }
 
-const myArr = [4, 10, 12, 15, 18, 22, 24, 25, 31, 35, 44, 50, 66, 70, 90];
-const tree = Tree(myArr);
-tree.print();
-
-let sum = 0;
-function getSum(x) {
-  return sum += x;
-}
+// const array = [3, 2, 1, 4, 5];
+// const tree = Tree(array);
+// tree.print();
